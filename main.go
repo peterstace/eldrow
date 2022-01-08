@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"flag"
-	"fmt"
 	"log"
 	"os"
 	"sort"
@@ -24,9 +23,7 @@ func main() {
 	}
 	words = selectWords(words)
 
-	for _, w := range words {
-		fmt.Println(w)
-	}
+	gameLoop(words)
 }
 
 func loadWords(filename string) ([]string, error) {
