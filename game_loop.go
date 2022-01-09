@@ -18,13 +18,10 @@ func gameLoop(dictionary []string) {
 	dictionary = uniquifySlice(dictionary)
 	log.Printf("done (after=%d)", len(dictionary))
 
-	// TODO: should be able to choose ANY word from the dictionary. So we
-	// shouldn't eliminate words yet.
-
 	// Update these manually as you guess.
 	log.Printf("applying existing guesses (before=%d)...", len(dictionary))
 	for _, g := range []guess{
-		//{"RATES", "YXXYX"},
+		{"LANES", "XXXYX"},
 	} {
 		oldDictionary := dictionary
 		dictionary = nil
@@ -120,7 +117,18 @@ func compatible(candidate string, guess guess) bool {
 				return false
 			}
 		case yellow:
-			if !strings.Contains(candidate, string(guess.word[i])) {
+			if candidate[i] == guess.word[i] {
+				return false
+			}
+
+			contains := false
+			for j := range candidate {
+				if candidate[j] == guess.word[i] {
+					contains = true
+					break
+				}
+			}
+			if !contains {
 				return false
 			}
 		case grey:
