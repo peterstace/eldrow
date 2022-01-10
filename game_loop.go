@@ -19,26 +19,33 @@ func gameLoop(dictionary []string) {
 	log.Printf("done (after=%d)", len(dictionary))
 
 	// Update these manually as you guess.
+	filtered := dictionary
 	log.Printf("applying existing guesses (before=%d)...", len(dictionary))
 	for _, g := range []guess{
-		{"LANES", "XXXYX"},
+		//{"LANES", "XXXXX"},
 	} {
-		oldDictionary := dictionary
-		dictionary = nil
-		for _, word := range oldDictionary {
+		oldFiltered := filtered
+		filtered = nil
+		for _, word := range oldFiltered {
 			if compatible(word, g) {
-				dictionary = append(dictionary, word)
+				filtered = append(filtered, word)
 			}
 		}
 	}
-	log.Printf("done (after=%d)", len(dictionary))
+	log.Printf("done (after=%d)", len(filtered))
+	if len(filtered) < 25 {
+		log.Println("filtered words:", filtered)
+	}
+	if len(filtered) <= 2 {
+		return
+	}
 
 	var options []option
-	for _, candidate := range sample(dictionary, 500) {
+	for _, candidate := range sample(dictionary, 500) { // TODO: boost this automatically
 		var total, comp int
-		for _, simulatedActual := range sample(dictionary, 200) {
+		for _, simulatedActual := range sample(filtered, 200) {
 			g := guess{meta: calculateMeta(candidate, simulatedActual), word: candidate}
-			for _, probe := range sample(dictionary, 200) {
+			for _, probe := range sample(filtered, 200) {
 				total++
 				if compatible(probe, g) {
 					comp++
