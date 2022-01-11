@@ -1,6 +1,7 @@
 package main
 
 import (
+	"constraints"
 	"fmt"
 	"log"
 	"math/rand"
@@ -41,7 +42,7 @@ func gameLoop(dictionary []string) {
 	}
 
 	var options []option
-	for _, candidate := range sample(dictionary, 500) { // TODO: boost this automatically
+	for _, candidate := range sample(dictionary, 1000) { // TODO: boost this automatically
 		var total, comp int
 		for _, simulatedActual := range sample(filtered, 200) {
 			g := guess{meta: calculateMeta(candidate, simulatedActual), word: candidate}
@@ -59,9 +60,17 @@ func gameLoop(dictionary []string) {
 	sort.Slice(options, func(i, j int) bool {
 		return options[i].score > options[j].score
 	})
-	for _, opt := range options {
+	top := min(10, len(options))
+	for _, opt := range options[:top] {
 		fmt.Println(opt)
 	}
+}
+
+func min[T constraints.Ordered](a, b T) T {
+	if a < b {
+		return a
+	}
+	return b
 }
 
 func sample(words []string, n int) []string {
