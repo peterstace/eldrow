@@ -20,7 +20,7 @@ func gameLoop() {
 	// Update these manually as you guess.
 	log.Printf("applying existing guesses (before=%d)...", len(possible))
 	for _, g := range []guess{
-		//{"RATES", "XXXXX"},
+		{"ROATE", "XXXXX"},
 	} {
 		possible = filter(
 			possible,
@@ -144,7 +144,7 @@ func compatible(candidate string, guess guess) bool {
 			}
 		case grey:
 			for j := range candidate {
-				if candidate[j] == guess.word[i] {
+				if candidate[j] == guess.word[i] && guess.meta[j] != 'G' {
 					return false
 				}
 			}

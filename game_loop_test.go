@@ -31,6 +31,36 @@ func TestCompatible(t *testing.T) {
 			candidate: "DRINK",
 			want:      true,
 		},
+		{
+			guess:     guess{"ROATE", "XXYXY"},
+			candidate: "ABBEY",
+			want:      true,
+		},
+		{
+			guess:     guess{"LENES", "XXXGX"},
+			candidate: "ABBEY",
+			want:      true,
+		},
+		{
+			guess:     guess{"MEADS", "XYYXX"},
+			candidate: "ABBEY",
+			want:      true,
+		},
+		{
+			guess:     guess{"HAPPY", "XYXXG"},
+			candidate: "ABBEY",
+			want:      true,
+		},
+		{
+			guess:     guess{"ATOPY", "GXXXG"},
+			candidate: "ABBEY",
+			want:      true,
+		},
+		{
+			guess:     guess{"ABBEY", "GGGGG"},
+			candidate: "ABBEY",
+			want:      true,
+		},
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			got := compatible(tc.candidate, tc.guess)
