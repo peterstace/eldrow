@@ -14,39 +14,34 @@ type option struct {
 	score     float64
 }
 
-func gameLoop(dictionary []string) {
-	log.Printf("uniquifying dictionary (before=%d)...", len(dictionary))
-	dictionary = uniquifySlice(dictionary)
-	log.Printf("done (after=%d)", len(dictionary))
+func gameLoop() {
+	possible := candidates()
 
 	// Update these manually as you guess.
-	filtered := dictionary
-	log.Printf("applying existing guesses (before=%d)...", len(dictionary))
+	log.Printf("applying existing guesses (before=%d)...", len(possible))
 	for _, g := range []guess{
-		//{"LANES", "XXXXX"},
+		//{"RATES", "XXXXX"},
 	} {
-		oldFiltered := filtered
-		filtered = nil
-		for _, word := range oldFiltered {
-			if compatible(word, g) {
-				filtered = append(filtered, word)
-			}
-		}
+		possible = filter(
+			possible,
+			func(word string) bool { return compatible(word, g) },
+		)
 	}
-	log.Printf("done (after=%d)", len(filtered))
-	if len(filtered) < 25 {
-		log.Println("filtered words:", filtered)
+	log.Printf("done (after=%d)", len(possible))
+	if len(possible) < 25 {
+		log.Println("possible solutions", possible)
 	}
-	if len(filtered) <= 2 {
+	if len(possible) <= 2 {
 		return
 	}
 
+	all := allWords()
 	var options []option
-	for _, candidate := range sample(dictionary, 1000) { // TODO: boost this automatically
+	for _, candidate := range sample(all, 500) { // TODO: boost this automatically
 		var total, comp int
-		for _, simulatedActual := range sample(filtered, 200) {
+		for _, simulatedActual := range sample(possible, 200) {
 			g := guess{meta: calculateMeta(candidate, simulatedActual), word: candidate}
-			for _, probe := range sample(filtered, 200) {
+			for _, probe := range sample(possible, 200) {
 				total++
 				if compatible(probe, g) {
 					comp++

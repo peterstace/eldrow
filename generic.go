@@ -1,5 +1,15 @@
 package main
 
+func filter[T any](slice []T, include func(T) bool) []T {
+	var filtered []T
+	for _, elem := range slice {
+		if include(elem) {
+			filtered = append(filtered, elem)
+		}
+	}
+	return filtered
+}
+
 func sliceContains[T comparable](slice []T, search T) bool {
 	for _, elem := range slice {
 		if elem == search {
