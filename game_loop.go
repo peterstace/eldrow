@@ -16,48 +16,55 @@ type option struct {
 
 func gameLoop() {
 	possible := candidates()
+	var guesses []guess
 
-	// Update these manually as you guess.
-	log.Printf("applying existing guesses (before=%d)...", len(possible))
-	for _, g := range []guess{
-		{"ROATE", "XXXXX"},
-	} {
-		possible = filter(
-			possible,
-			func(word string) bool { return compatible(word, g) },
-		)
-	}
-	log.Printf("done (after=%d)", len(possible))
-	if len(possible) < 25 {
-		log.Println("possible solutions", possible)
-	}
-	if len(possible) <= 2 {
-		return
-	}
+	for {
+		log.Printf("applying existing guesses (before=%d)...", len(possible))
+		for _, g := range guesses {
+			possible = filter(
+				possible,
+				func(word string) bool { return compatible(word, g) },
+			)
+		}
+		log.Printf("done (after=%d)", len(possible))
+		if len(possible) < 25 {
+			log.Println("possible solutions", possible)
+		}
+		if len(possible) <= 2 {
+			return
+		}
 
-	all := allWords()
-	var options []option
-	for _, candidate := range sample(all, 500) { // TODO: boost this automatically
-		var total, comp int
-		for _, simulatedActual := range sample(possible, 200) {
-			g := guess{meta: calculateMeta(candidate, simulatedActual), word: candidate}
-			for _, probe := range sample(possible, 200) {
-				total++
-				if compatible(probe, g) {
-					comp++
+		log.Printf("calculating suggestions...\n")
+		all := allWords()
+		var options []option
+		for _, candidate := range sample(all, 500) { // TODO: boost this automatically
+			var total, comp int
+			for _, simulatedActual := range sample(possible, 200) {
+				g := guess{meta: calculateMeta(candidate, simulatedActual), word: candidate}
+				for _, probe := range sample(possible, 200) {
+					total++
+					if compatible(probe, g) {
+						comp++
+					}
 				}
 			}
+			score := float64(total-comp) / float64(total)
+			options = append(options, option{candidate, score})
 		}
-		score := float64(total-comp) / float64(total)
-		options = append(options, option{candidate, score})
-	}
 
-	sort.Slice(options, func(i, j int) bool {
-		return options[i].score > options[j].score
-	})
-	top := min(10, len(options))
-	for _, opt := range options[:top] {
-		fmt.Println(opt)
+		sort.Slice(options, func(i, j int) bool {
+			return options[i].score > options[j].score
+		})
+		top := min(10, len(options))
+		for _, opt := range options[:top] {
+			fmt.Println(opt)
+		}
+
+		g, err := InputGuess()
+		if err != nil {
+			log.Fatalf("input guess failed: %v", err)
+		}
+		guesses = append(guesses, g)
 	}
 }
 
